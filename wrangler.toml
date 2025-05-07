@@ -1,0 +1,9 @@
+name = "revanced-nonroot"
+main = "dist/index.js"
+compatibility_date = "2025-05-06"
+workers_dev = true
+
+# R2 binding
+[[r2_buckets]]
+binding = "R2"
+bucket_name = "revanced-nonroot"

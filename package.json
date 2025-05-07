@@ -1,0 +1,14 @@
+{
+  "name": "revanced-nonroot",
+  "version": "1.0.0",
+  "description": "Cloudflare Worker for ReVanced apps repository",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "esbuild index.js --bundle --outfile=dist/index.js --format=iife --minify",
+    "deploy": "npm run build && wrangler deploy"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "esbuild": "^0.20.2"
+  }
+}
