@@ -23,24 +23,25 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
       <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
       
       <!-- Dynamic favicon -->
-      <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><defs><linearGradient id=%22grad%22 x1=%220%25%22 y1=%220%25%22 x2=%22100%25%22 y2=%22100%25%22><stop offset=%220%25%22 style=%22stop-color:%23FF0000;stop-opacity:1%22 /><stop offset=%22100%25%22 style=%22stop-color:%23B71C1C;stop-opacity:1%22 /></linearGradient></defs><text x=%2210%22 y=%2280%22 font-size=%2280%22 font-family=%22Poppins, sans-serif%22 font-weight=%22700%22 fill=%22url(%23grad)%22>R</text></svg>">
+      <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><defs><linearGradient id=%22grad%22 x1=%220%25%22 y1=%220%25%22 x2=%22100%25%22 y2=%22100%25%22><stop offset=%220%25%22 style=%22stop-color:%23FF6B6B;stop-opacity:1%22 /><stop offset=%22100%25%22 style=%22stop-color:%23B71C1C;stop-opacity:1%22 /></linearGradient></defs><text x=%2210%22 y=%2280%22 font-size=%2280%22 font-family=%22Poppins, sans-serif%22 font-weight=%22700%22 fill=%22url(%23grad)%22>R</text></svg>">
       
       <!-- Inline critical CSS -->
       <style>
         :root {
-          --primary: #FF0000;
-          --primary-light: #FF5722;
-          --accent: #FF5722;
+          --primary: #FF6B6B; /* Light red for text/fallback */
+          --primary-light: #FF8A8A; /* Lighter red for hover */
+          --accent: #FF8A8A;
           --text: #E0E0E0;
           --text-light: #B0B0B0;
           --bg: #121212;
           --surface: #1E1E1E;
           --border: #2C2C2C;
-          --error: #B71C1C;
-          --error-light: #3F0A0A;
+          --error: #CF6679; /* Soft red for errors */
+          --error-light: #3A1C24; /* Darker error bg */
           --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
           --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
-          --gradient: linear-gradient(135deg, #FF0000 0%, #B71C1C 100%);
+          --gradient: linear-gradient(135deg, #FF6B6B 0%, #B71C1C 100%);
+          --gradient-light: linear-gradient(135deg, #FF8A8A 0%, #D32F2F 100%);
           /* Light mode variables */
           --bg-light: #F5F5F5;
           --surface-light: #FFFFFF;
@@ -79,13 +80,10 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           color: var(--text-light-mode);
         }
 
-        body.light-mode .header {
-          background: linear-gradient(135deg, #FF5722 0%, #D81B60 100%);
-        }
-
-        body.light-mode .file-table th {
-          background-color: var(--primary-light);
-          color: var(--text);
+        body.light-mode .header,
+        body.light-mode .file-table th,
+        body.light-mode .btn-primary {
+          background: var(--gradient-light);
         }
 
         body.light-mode .search-input {
@@ -239,7 +237,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
         }
 
         .breadcrumb a:hover {
-          background-color: rgba(255, 87, 34, 0.1);
+          background-color: rgba(255, 138, 138, 0.1);
         }
 
         /* Stats grid */
@@ -320,7 +318,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
         .search-input:focus {
           outline: none;
           border-color: var(--primary);
-          box-shadow: 0 0 0 3px rgba(255, 0, 0, 0.2);
+          box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
         }
 
         .search-icon {
@@ -338,7 +336,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
         }
 
         .file-table th {
-          background-color: var(--primary);
+          background: var(--gradient);
           color: var(--text);
           padding: 1rem;
           text-align: left;
@@ -355,7 +353,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
         .file-icon {
           width: 40px;
           height: 40px;
-          background-color: rgba(255, 0, 0, 0.1);
+          background-color: rgba(255, 107, 107, 0.1);
           border-radius: 12px;
           display: inline-flex;
           align-items: center;
@@ -392,7 +390,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
         .file-badge {
           display: inline-block;
           padding: 0.25rem 0.5rem;
-          background-color: var(--primary-light);
+          background: var(--gradient);
           color: var(--text);
           border-radius: 0.25rem;
           font-size: 0.6875rem;
@@ -495,15 +493,15 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
         }
 
         .btn-primary {
-          background-color: var(--primary);
+          background: var(--gradient);
           color: var(--text);
-          box-shadow: 0 4px 6px -1px rgba(255, 0, 0, 0.3);
+          box-shadow: 0 4px 6px -1px rgba(255, 107, 107, 0.3);
         }
 
         .btn-primary:hover {
-          background-color: var(--primary-light);
+          background: var(--gradient-light);
           transform: translateY(-2px);
-          box-shadow: 0 10px 15px -3px rgba(255, 87, 34, 0.3);
+          box-shadow: 0 10px 15px -3px rgba(255, 138, 138, 0.3);
         }
 
         .btn-outline {
@@ -559,7 +557,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
             <svg class="header-logo-icon" viewBox="0 0 100 100">
               <defs>
                 <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" style="stop-color:#FF0000;stop-opacity:1" />
+                  <stop offset="0%" style="stop-color:#FF6B6B;stop-opacity:1" />
                   <stop offset="100%" style="stop-color:#B71C1C;stop-opacity:1" />
                 </linearGradient>
               </defs>
@@ -663,7 +661,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
                   <tr class="file-row" data-name="${folderName.toLowerCase()}">
                     <td data-label="Name">
                       <div class="file-name">
-                        <div class="file-icon" style="color: var(--accent); background-color: rgba(255, 87, 34, 0.1)">
+                        <div class="file-icon" style="color: var(--accent); background-color: rgba(255, 138, 138, 0.1)">
                           <i class="fas fa-folder-open"></i>
                         </div>
                         <div class="file-name-content">
@@ -695,13 +693,13 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
                 if (['apk', 'aab'].includes(fileExt)) {
                   fileType = 'Android';
                   fileIcon = 'robot';
-                  iconColor = '#FF0000';
-                  iconBg = 'rgba(255, 0, 0, 0.1)';
+                  iconColor = '#FF6B6B';
+                  iconBg = 'rgba(255, 107, 107, 0.1)';
                 } else if (['zip', 'rar', '7z', 'tar', 'gz'].includes(fileExt)) {
                   fileType = 'Archive';
                   fileIcon = 'file-archive';
-                  iconColor = '#FF5722';
-                  iconBg = 'rgba(255, 87, 34, 0.1)';
+                  iconColor = '#FF8A8A';
+                  iconBg = 'rgba(255, 138, 138, 0.1)';
                 } else if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(fileExt)) {
                   fileType = 'Image';
                   fileIcon = 'file-image';
@@ -715,13 +713,13 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
                 } else if (['mp4', 'mov', 'avi', 'mkv', 'webm'].includes(fileExt)) {
                   fileType = 'Video';
                   fileIcon = 'file-video';
-                  iconColor = '#FF5722';
-                  iconBg = 'rgba(255, 87, 34, 0.1)';
+                  iconColor = '#FF8A8A';
+                  iconBg = 'rgba(255, 138, 138, 0.1)';
                 } else if (['pdf'].includes(fileExt)) {
                   fileType = 'PDF';
                   fileIcon = 'file-pdf';
-                  iconColor = '#FF0000';
-                  iconBg = 'rgba(255, 0, 0, 0.1)';
+                  iconColor = '#FF6B6B';
+                  iconBg = 'rgba(255, 107, 107, 0.1)';
                 } else if (['txt', 'csv', 'json', 'xml'].includes(fileExt)) {
                   fileType = 'Text';
                   fileIcon = 'file-alt';
@@ -735,13 +733,13 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
                 } else if (['xls', 'xlsx', 'ods'].includes(fileExt)) {
                   fileType = 'Excel';
                   fileIcon = 'file-excel';
-                  iconColor = '#FF5722';
-                  iconBg = 'rgba(255, 87, 34, 0.1)';
+                  iconColor = '#FF8A8A';
+                  iconBg = 'rgba(255, 138, 138, 0.1)';
                 } else if (['ppt', 'pptx', 'odp'].includes(fileExt)) {
                   fileType = 'PowerPoint';
                   fileIcon = 'file-powerpoint';
-                  iconColor = '#FF5722';
-                  iconBg = 'rgba(255, 87, 34, 0.1)';
+                  iconColor = '#FF8A8A';
+                  iconBg = 'rgba(255, 138, 138, 0.1)';
                 } else {
                   fileType = 'File';
                   fileIcon = 'file';
@@ -868,7 +866,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
               bottom: 20px;
               left: 50%;
               transform: translateX(-50%) translateY(100%);
-              background-color: \${type === 'error' ? '#B71C1C' : '#FF0000'};
+              background: \${type === 'error' ? '#CF6679' : 'var(--gradient)'};
               color: #E0E0E0;
               padding: 12px 24px;
               border-radius: 8px;
@@ -934,17 +932,18 @@ export function generateErrorHtml(errorMessage, url) {
       <!-- Shared CSS -->
       <style>
         :root {
-          --primary: #FF0000;
-          --primary-light: #FF5722;
-          --error: #B71C1C;
-          --error-light: #3F0A0A;
+          --primary: #FF6B6B;
+          --primary-light: #FF8A8A;
+          --error: #CF6679;
+          --error-light: #3A1C24;
           --text: #E0E0E0;
           --text-light: #B0B0B0;
           --bg: #121212;
           --surface: #1E1E1E;
           --border: #2C2C2C;
           --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-          --gradient: linear-gradient(135deg, #FF0000 0%, #B71C1C 100%);
+          --gradient: linear-gradient(135deg, #FF6B6B 0%, #B71C1C 100%);
+          --gradient-light: linear-gradient(135deg, #FF8A8A 0%, #D32F2F 100%);
           /* Light mode */
           --bg-light: #F5F5F5;
           --surface-light: #FFFFFF;
@@ -976,13 +975,14 @@ export function generateErrorHtml(errorMessage, url) {
           color: var(--text-light-mode);
         }
 
-        body.light-mode .error-header {
-          background: linear-gradient(135deg, #FF5722 0%, #D81B60 100%);
+        body.light-mode .error-header,
+        body.light-mode .btn-primary {
+          background: var(--gradient-light);
         }
 
         body.light-mode .error-code {
           background: #FFE0E0;
-          color: #B71C1C;
+          color: #CF6679;
         }
 
         body.light-mode .error-footer {
@@ -1049,14 +1049,14 @@ export function generateErrorHtml(errorMessage, url) {
         }
 
         .btn-primary {
-          background: var(--primary);
+          background: var(--gradient);
           color: var(--text);
           border: none;
-          box-shadow: 0 4px 6px -1px rgba(255, 0, 0, 0.3);
+          box-shadow: 0 4px 6px -1px rgba(255, 107, 107, 0.3);
         }
 
         .btn-primary:hover {
-          background: var(--primary-light);
+          background: var(--gradient-light);
           transform: translateY(-2px);
         }
 
@@ -1161,4 +1161,4 @@ export function generateErrorHtml(errorMessage, url) {
   `;
   
   return html;
-                    }
+}
