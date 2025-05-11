@@ -1,6 +1,5 @@
 export function generateHtml(url, prefix, folders, files, isTruncated, cursor, formatFileSize) {
-  // Dynamic stats
-  const totalSize = files.reduce((sum, file) => sum + file.size, 0);
+  // Dynamic last updated
   const lastUpdated = new Date().toLocaleString('en-US', {
     month: 'short',
     day: 'numeric',
@@ -9,28 +8,32 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
     minute: '2-digit'
   });
 
+  // Detect browser language
+  const browserLanguage = navigator?.language || 'en';
+  const defaultLanguage = browserLanguage.startsWith('vi') ? 'vi' : 'en';
+
   let html = `
     <!DOCTYPE html>
-    <html lang="en">
+    <html lang="${defaultLanguage}">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-      <title>ReVanced Apps Repository</title>
-      <meta name="description" content="Download pre-patched ReVanced Android applications">
+      <title id="page-title">${defaultLanguage === 'vi' ? 'Kho ứng dụng ReVanced' : 'ReVanced Apps Repository'}</title>
+      <meta name="description" content="${defaultLanguage === 'vi' ? 'Tải ứng dụng Android đã được vá sẵn' : 'Download pre-patched ReVanced Android applications'}">
       
       <!-- Preload critical resources -->
       <link rel="preload" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Roboto+Mono&display=swap" as="style">
       <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" as="style">
       
       <!-- Dynamic favicon -->
-      <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><defs><linearGradient id=%22grad%22 x1=%220%25%22 y1=%220%25%22 x2=%22100%25%22 y2=%22100%25%22><stop offset=%220%25%22 style=%22stop-color:%23FF6B6B;stop-opacity:1%22 /><stop offset=%22100%25%22 style=%22stop-color:%23B71C1C;stop-opacity:1%22 /></linearGradient></defs><text x=%2210%22 y=%2280%22 font-size=%2280%22 font-family=%22Poppins, sans-serif%22 font-weight=%22700%22 fill=%22url(%23grad)%22>R</text></svg>">
+      <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><defs><linearGradient id=%22grad%22 x1=%220%25%22 y1=%220%25%22 x2=%22100%25%22 y2=%22100%25%22><stop offset=%220%25%22 style=%22stop-color:%2300BCD4;stop-opacity:1%22 /><stop offset=%22100%25%22 style=%22stop-color:%2300838F;stop-opacity:1%22 /></linearGradient></defs><text x=%2210%22 y=%2280%22 font-size=%2280%22 font-family=%22Poppins, sans-serif%22 font-weight=%22700%22 fill=%22url(%23grad)%22>R</text></svg>">
       
       <!-- Inline critical CSS -->
       <style>
         :root {
-          --primary: #FF6B6B; /* Light red for text/fallback */
-          --primary-light: #FF8A8A; /* Lighter red for hover */
-          --accent: #FF8A8A;
+          --primary: #00BCD4; /* Cyan for text/fallback */
+          --primary-light: #4DD0E1; /* Lighter cyan for hover */
+          --accent: #4DD0E1;
           --text: #E0E0E0;
           --text-light: #B0B0B0;
           --bg: #121212;
@@ -40,8 +43,8 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           --error-light: #3A1C24; /* Darker error bg */
           --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
           --hover-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.4);
-          --gradient: linear-gradient(135deg, #FF6B6B 0%, #B71C1C 100%);
-          --gradient-light: linear-gradient(135deg, #FF8A8A 0%, #D32F2F 100%);
+          --gradient: linear-gradient(135deg, #00BCD4 0%, #00838F 100%);
+          --gradient-light: linear-gradient(135deg, #4DD0E1 0%, #00ACC1 100%);
           /* Light mode variables */
           --bg-light: #F5F5F5;
           --surface-light: #FFFFFF;
@@ -74,7 +77,6 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
 
         body.light-mode .hero,
         body.light-mode .file-explorer,
-        body.light-mode .stat-card,
         body.light-mode .error-container {
           background-color: var(--surface-light);
           color: var(--text-light-mode);
@@ -174,7 +176,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           color: var(--primary-light);
         }
 
-        .theme-toggle {
+        .theme-toggle, .lang-toggle {
           background: none;
           border: none;
           color: var(--text);
@@ -183,7 +185,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           transition: transform 0.2s;
         }
 
-        .theme-toggle:hover {
+        .theme-toggle:hover, .lang-toggle:hover {
           transform: scale(1.1);
         }
 
@@ -237,35 +239,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
         }
 
         .breadcrumb a:hover {
-          background-color: rgba(255, 138, 138, 0.1);
-        }
-
-        /* Stats grid */
-        .stats-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
-          gap: 1rem;
-          margin-bottom: 1.5rem;
-        }
-
-        .stat-card {
-          background: var(--surface);
-          padding: 1.25rem;
-          border-radius: 0.75rem;
-          box-shadow: var(--card-shadow);
-          transition: transform 0.2s;
-        }
-
-        .stat-card:hover {
-          transform: translateY(-3px);
-          box-shadow: var(--hover-shadow);
-        }
-
-        .stat-value {
-          font-size: 1.5rem;
-          font-weight: 700;
-          color: var(--primary);
-          margin-bottom: 0.25rem;
+          background-color: rgba(77, 208, 225, 0.1);
         }
 
         /* File explorer */
@@ -318,7 +292,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
         .search-input:focus {
           outline: none;
           border-color: var(--primary);
-          box-shadow: 0 0 0 3px rgba(255, 107, 107, 0.2);
+          box-shadow: 0 0 0 3px rgba(0, 188, 212, 0.2);
         }
 
         .search-icon {
@@ -353,7 +327,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
         .file-icon {
           width: 40px;
           height: 40px;
-          background-color: rgba(255, 107, 107, 0.1);
+          background-color: rgba(0, 188, 212, 0.1);
           border-radius: 12px;
           display: inline-flex;
           align-items: center;
@@ -495,13 +469,13 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
         .btn-primary {
           background: var(--gradient);
           color: var(--text);
-          box-shadow: 0 4px 6px -1px rgba(255, 107, 107, 0.3);
+          box-shadow: 0 4px 6px -1px rgba(0, 188, 212, 0.3);
         }
 
         .btn-primary:hover {
           background: var(--gradient-light);
           transform: translateY(-2px);
-          box-shadow: 0 10px 15px -3px rgba(255, 138, 138, 0.3);
+          box-shadow: 0 10px 15px -3px rgba(77, 208, 225, 0.3);
         }
 
         .btn-outline {
@@ -557,8 +531,8 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
             <svg class="header-logo-icon" viewBox="0 0 100 100">
               <defs>
                 <linearGradient id="logoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" style="stop-color:#FF6B6B;stop-opacity:1" />
-                  <stop offset="100%" style="stop-color:#B71C1C;stop-opacity:1" />
+                  <stop offset="0%" style="stop-color:#00BCD4;stop-opacity:1" />
+                  <stop offset="100%" style="stop-color:#00838F;stop-opacity:1" />
                 </linearGradient>
               </defs>
               <text x="10" y="80" font-size="80" font-family="'Poppins', sans-serif" font-weight="700" fill="url(#logoGrad)">R</text>
@@ -566,10 +540,12 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
             <span class="header-logo-text">ReVanced</span>
           </a>
           <nav class="header-nav">
-            <a href="/">Home</a>
+            <a href="/" data-translate="nav-home">${defaultLanguage === 'vi' ? 'Trang chủ' : 'Home'}</a>
             <a href="https://github.com/luxysiv/revanced-nonroot" target="_blank">GitHub</a>
-            <a href="#stats">Stats</a>
-            <button class="theme-toggle" aria-label="Toggle theme">
+            <button class="lang-toggle" aria-label="${defaultLanguage === 'vi' ? 'Chuyển ngôn ngữ' : 'Toggle language'}" title="${defaultLanguage === 'vi' ? 'Chuyển ngôn ngữ' : 'Toggle language'}">
+              <i class="fas fa-globe"></i>
+            </button>
+            <button class="theme-toggle" aria-label="${defaultLanguage === 'vi' ? 'Chuyển chế độ' : 'Toggle theme'}">
               <i class="fas fa-moon"></i>
             </button>
           </nav>
@@ -580,16 +556,16 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
         <!-- Hero Section -->
         <section class="hero">
           <div class="hero-content">
-            <h1>ReVanced Apps Repository</h1>
-            <p class="subtitle">Download pre-patched Android applications with extended features</p>
+            <h1 data-translate="hero-title">${defaultLanguage === 'vi' ? 'Kho ứng dụng ReVanced' : 'ReVanced Apps Repository'}</h1>
+            <p class="subtitle" data-translate="hero-subtitle">${defaultLanguage === 'vi' ? 'Các ứng dụng Android đã được vá với các bản vá của ReVanced' : 'Download pre-patched Android applications with extended features'}</p>
             <div style="display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap;">
               <a href="https://github.com/luxysiv/revanced-nonroot" class="btn btn-primary" target="_blank">
                 <i class="fab fa-github"></i>
-                GitHub Project
+                <span data-translate="btn-github">${defaultLanguage === 'vi' ? 'Dự án GitHub' : 'GitHub Project'}</span>
               </a>
               <a href="#file-explorer" class="btn btn-primary">
                 <i class="fas fa-folder-open"></i>
-                View Files
+                <span data-translate="btn-files">${defaultLanguage === 'vi' ? 'Xem tệp' : 'View Files'}</span>
               </a>
             </div>
           </div>
@@ -597,7 +573,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
 
         <!-- Breadcrumb Navigation -->
         <nav class="breadcrumb" aria-label="Breadcrumb">
-          <a href="/"><i class="fas fa-home"></i> Home</a>
+          <a href="/"><i class="fas fa-home"></i> <span data-translate="nav-home">${defaultLanguage === 'vi' ? 'Trang chủ' : 'Home'}</span></a>
           ${prefix ? prefix.split('/').filter(Boolean).map((part, i, parts) => {
             const path = parts.slice(0, i + 1).join('/') + '/';
             return `
@@ -607,42 +583,22 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           }).join('') : ''}
         </nav>
 
-        <!-- Statistics Cards -->
-        <section id="stats" class="stats-grid">
-          <div class="stat-card animate-in" style="animation-delay: 0.1s">
-            <div class="stat-value">${folders.length}</div>
-            <div>Folders</div>
-          </div>
-          <div class="stat-card animate-in" style="animation-delay: 0.2s">
-            <div class="stat-value">${files.length}</div>
-            <div>Files</div>
-          </div>
-          <div class="stat-card animate-in" style="animation-delay: 0.3s">
-            <div class="stat-value">${formatFileSize(totalSize)}</div>
-            <div>Total Size</div>
-          </div>
-          <div class="stat-card animate-in" style="animation-delay: 0.4s">
-            <div class="stat-value">${lastUpdated}</div>
-            <div>Last Updated</div>
-          </div>
-        </section>
-
         <!-- File Explorer -->
         <div id="file-explorer" class="file-explorer animate-in" style="animation-delay: 0.5s">
           <div class="file-header">
-            <h2 style="font-size: 1.125rem; font-weight: 600;">File Explorer</h2>
+            <h2 style="font-size: 1.125rem; font-weight: 600;" data-translate="file-explorer">${defaultLanguage === 'vi' ? 'Tìm tệp' : 'File Explorer'}</h2>
             <div class="search-box">
               <i class="fas fa-search search-icon"></i>
-              <input type="text" class="search-input" placeholder="Search files..." id="searchInput" aria-label="Search files">
+              <input type="text" class="search-input" placeholder="${defaultLanguage === 'vi' ? 'Tìm kiếm tệp...' : 'Search files...'}" id="searchInput" aria-label="${defaultLanguage === 'vi' ? 'Tìm kiếm tệp' : 'Search files'}">
             </div>
           </div>
 
           <table class="file-table">
             <thead>
               <tr>
-                <th>Name</th>
-                <th>Size</th>
-                <th>Modified</th>
+                <th data-translate="table-name">${defaultLanguage === 'vi' ? 'Tên' : 'Name'}</th>
+                <th data-translate="table-size">${defaultLanguage === 'vi' ? 'Kích thước' : 'Size'}</th>
+                <th data-translate="table-modified">${defaultLanguage === 'vi' ? 'Đã sửa đổi' : 'Modified'}</th>
               </tr>
             </thead>
             <tbody id="fileTableBody">
@@ -650,7 +606,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
                 <tr>
                   <td colspan="3" style="text-align: center; padding: 2rem;">
                     <i class="fas fa-folder-open" style="font-size: 2.5rem; color: var(--text-light); margin-bottom: 1rem;"></i>
-                    <p style="color: var(--text-light);">This folder is empty</p>
+                    <p style="color: var(--text-light);" data-translate="empty-folder">${defaultLanguage === 'vi' ? 'Thư mục này trống' : 'This folder is empty'}</p>
                   </td>
                 </tr>
               ` : ''}
@@ -659,19 +615,19 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
                 const folderUrl = `${url.pathname}?prefix=${encodeURIComponent(folder)}`;
                 return `
                   <tr class="file-row" data-name="${folderName.toLowerCase()}">
-                    <td data-label="Name">
+                    <td data-label="${defaultLanguage === 'vi' ? 'Tên' : 'Name'}">
                       <div class="file-name">
-                        <div class="file-icon" style="color: var(--accent); background-color: rgba(255, 138, 138, 0.1)">
+                        <div class="file-icon" style="color: var(--accent); background-color: rgba(77, 208, 225, 0.1)">
                           <i class="fas fa-folder-open"></i>
                         </div>
                         <div class="file-name-content">
                           <a href="${folderUrl}" class="file-link">${folderName}</a>
-                          <span class="file-badge">Folder</span>
+                          <span class="file-badge" data-translate="badge-folder">${defaultLanguage === 'vi' ? 'Thư mục' : 'Folder'}</span>
                         </div>
                       </div>
                     </td>
-                    <td data-label="Size" class="file-size">-</td>
-                    <td data-label="Modified" class="file-date">-</td>
+                    <td data-label="${defaultLanguage === 'vi' ? 'Kích thước' : 'Size'}" class="file-size">-</td>
+                    <td data-label="${defaultLanguage === 'vi' ? 'Đã sửa đổi' : 'Modified'}" class="file-date">-</td>
                   </tr>
                 `;
               }).join('')}
@@ -693,13 +649,13 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
                 if (['apk', 'aab'].includes(fileExt)) {
                   fileType = 'Android';
                   fileIcon = 'robot';
-                  iconColor = '#FF6B6B';
-                  iconBg = 'rgba(255, 107, 107, 0.1)';
+                  iconColor = '#00BCD4';
+                  iconBg = 'rgba(0, 188, 212, 0.1)';
                 } else if (['zip', 'rar', '7z', 'tar', 'gz'].includes(fileExt)) {
                   fileType = 'Archive';
                   fileIcon = 'file-archive';
-                  iconColor = '#FF8A8A';
-                  iconBg = 'rgba(255, 138, 138, 0.1)';
+                  iconColor = '#4DD0E1';
+                  iconBg = 'rgba(77, 208, 225, 0.1)';
                 } else if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(fileExt)) {
                   fileType = 'Image';
                   fileIcon = 'file-image';
@@ -713,13 +669,13 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
                 } else if (['mp4', 'mov', 'avi', 'mkv', 'webm'].includes(fileExt)) {
                   fileType = 'Video';
                   fileIcon = 'file-video';
-                  iconColor = '#FF8A8A';
-                  iconBg = 'rgba(255, 138, 138, 0.1)';
+                  iconColor = '#4DD0E1';
+                  iconBg = 'rgba(77, 208, 225, 0.1)';
                 } else if (['pdf'].includes(fileExt)) {
                   fileType = 'PDF';
                   fileIcon = 'file-pdf';
-                  iconColor = '#FF6B6B';
-                  iconBg = 'rgba(255, 107, 107, 0.1)';
+                  iconColor = '#00BCD4';
+                  iconBg = 'rgba(0, 188, 212, 0.1)';
                 } else if (['txt', 'csv', 'json', 'xml'].includes(fileExt)) {
                   fileType = 'Text';
                   fileIcon = 'file-alt';
@@ -733,13 +689,13 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
                 } else if (['xls', 'xlsx', 'ods'].includes(fileExt)) {
                   fileType = 'Excel';
                   fileIcon = 'file-excel';
-                  iconColor = '#FF8A8A';
-                  iconBg = 'rgba(255, 138, 138, 0.1)';
+                  iconColor = '#4DD0E1';
+                  iconBg = 'rgba(77, 208, 225, 0.1)';
                 } else if (['ppt', 'pptx', 'odp'].includes(fileExt)) {
                   fileType = 'PowerPoint';
                   fileIcon = 'file-powerpoint';
-                  iconColor = '#FF8A8A';
-                  iconBg = 'rgba(255, 138, 138, 0.1)';
+                  iconColor = '#4DD0E1';
+                  iconBg = 'rgba(77, 208, 225, 0.1)';
                 } else {
                   fileType = 'File';
                   fileIcon = 'file';
@@ -749,7 +705,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
 
                 return `
                   <tr class="file-row" data-name="${fileName.toLowerCase()}">
-                    <td data-label="Name">
+                    <td data-label="${defaultLanguage === 'vi' ? 'Tên' : 'Name'}">
                       <div class="file-name">
                         <div class="file-icon" style="color: ${iconColor}; background-color: ${iconBg}">
                           <i class="fas fa-${fileIcon}"></i>
@@ -763,8 +719,8 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
                         </div>
                       </div>
                     </td>
-                    <td data-label="Size" class="file-size">${formatFileSize(file.size)}</td>
-                    <td data-label="Modified" class="file-date">${uploadDate}</td>
+                    <td data-label="${defaultLanguage === 'vi' ? 'Kích thước' : 'Size'}" class="file-size">${formatFileSize(file.size)}</td>
+                    <td data-label="${defaultLanguage === 'vi' ? 'Đã sửa đổi' : 'Modified'}" class="file-date">${uploadDate}</td>
                   </tr>
                 `;
               }).join('')}
@@ -777,21 +733,100 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
         <div style="text-align: center; margin-bottom: 1.5rem;">
           <a href="${url.pathname}?prefix=${encodeURIComponent(prefix || '')}&cursor=${encodeURIComponent(cursor)}" 
              class="btn btn-primary" id="loadMoreBtn">
-            <i class="fas fa-plus"></i> Load More
+            <i class="fas fa-plus"></i> <span data-translate="btn-load-more">${defaultLanguage === 'vi' ? 'Tải thêm' : 'Load More'}</span>
           </a>
         </div>
         ` : ''}
 
         <!-- Footer -->
         <footer class="footer">
-          <p>© ${new Date().getFullYear()} ReVanced Apps Repository • Created by <a href="https://github.com/luxysiv" target="_blank">Manh Duong</a></p>
-          <p>Version ${lastUpdated} • Powered by Cloudflare Workers</p>
+          <p>© ${new Date().getFullYear()} ReVanced Apps Repository • <span data-translate="footer-created">${defaultLanguage === 'vi' ? 'Được tạo bởi' : 'Created by'}</span> <a href="https://github.com/luxysiv" target="_blank">Manh Duong</a></p>
+          <p><span data-translate="footer-version">${defaultLanguage === 'vi' ? 'Phiên bản' : 'Version'}</span> ${lastUpdated} • Powered by Cloudflare Workers</p>
         </footer>
       </div>
 
       <!-- JavaScript Enhancements -->
       <script>
         document.addEventListener('DOMContentLoaded', function() {
+          // Language Toggle
+          const translations = {
+            en: {
+              'page-title': 'ReVanced Apps Repository',
+              'nav-home': 'Home',
+              'hero-title': 'ReVanced Apps Repository',
+              'hero-subtitle': 'Download pre-patched Android applications with extended features',
+              'btn-github': 'GitHub Project',
+              'btn-files': 'View Files',
+              'file-explorer': 'File Explorer',
+              'table-name': 'Name',
+              'table-size': 'Size',
+              'table-modified': 'Modified',
+              'empty-folder': 'This folder is empty',
+              'badge-folder': 'Folder',
+              'btn-load-more': 'Load More',
+              'footer-created': 'Created by',
+              'footer-version': 'Version'
+            },
+            vi: {
+              'page-title': 'Kho ứng dụng ReVanced',
+              'nav-home': 'Trang chủ',
+              'hero-title': 'Kho ứng dụng ReVanced',
+              'hero-subtitle': 'Các ứng dụng Android đã được vá với các bản vá của ReVanced',
+              'btn-github': 'Dự án GitHub',
+              'btn-files': 'Xem tệp',
+              'file-explorer': 'Tìm tệp',
+              'table-name': 'Tên',
+              'table-size': 'Kích thước',
+              'table-modified': 'Đã sửa đổi',
+              'empty-folder': 'Thư mục này trống',
+              'badge-folder': 'Thư mục',
+              'btn-load-more': 'Tải thêm',
+              'footer-created': 'Được tạo bởi',
+              'footer-version': 'Phiên bản'
+            }
+          };
+
+          // Get initial language from localStorage or browser
+          let currentLang = localStorage.getItem('language') || 
+                          (navigator.language.startsWith('vi') ? 'vi' : 'en');
+
+          function updateLanguage(lang) {
+            document.querySelectorAll('[data-translate]').forEach(element => {
+              const key = element.getAttribute('data-translate');
+              if (translations[lang][key]) {
+                element.textContent = translations[lang][key];
+              }
+            });
+            document.getElementById('page-title').textContent = translations[lang]['page-title'];
+            document.querySelector('html').lang = lang;
+            localStorage.setItem('language', lang);
+            
+            // Update search placeholder
+            const searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+              searchInput.placeholder = lang === 'vi' ? 'Tìm kiếm tệp...' : 'Search files...';
+              searchInput.setAttribute('aria-label', lang === 'vi' ? 'Tìm kiếm tệp' : 'Search files');
+            }
+            
+            // Update language toggle title
+            const langToggle = document.querySelector('.lang-toggle');
+            if (langToggle) {
+              langToggle.setAttribute('title', lang === 'en' ? 'Chuyển sang tiếng Việt' : 'Switch to English');
+              langToggle.setAttribute('aria-label', lang === 'en' ? 'Chuyển ngôn ngữ' : 'Toggle language');
+            }
+          }
+
+          // Initialize with current language
+          updateLanguage(currentLang);
+
+          const langToggle = document.querySelector('.lang-toggle');
+          if (langToggle) {
+            langToggle.addEventListener('click', () => {
+              currentLang = currentLang === 'en' ? 'vi' : 'en';
+              updateLanguage(currentLang);
+            });
+          }
+
           // Theme Toggle
           const themeToggle = document.querySelector('.theme-toggle');
           const body = document.body;
@@ -812,13 +847,15 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           const searchInput = document.getElementById('searchInput');
           const fileRows = document.querySelectorAll('.file-row');
           
-          searchInput.addEventListener('input', function() {
-            const searchTerm = this.value.toLowerCase().trim();
-            fileRows.forEach(row => {
-              const fileName = row.getAttribute('data-name');
-              row.style.display = fileName.includes(searchTerm) ? '' : 'none';
+          if (searchInput) {
+            searchInput.addEventListener('input', function() {
+              const searchTerm = this.value.toLowerCase().trim();
+              fileRows.forEach(row => {
+                const fileName = row.getAttribute('data-name');
+                row.style.display = fileName.includes(searchTerm) ? '' : 'none';
+              });
             });
-          });
+          }
 
           // Download Feedback
           document.querySelectorAll('.file-link[download]').forEach(link => {
@@ -828,7 +865,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
               const fileUrl = this.href;
               const icon = this.closest('.file-name').querySelector('.file-icon');
               icon.style.transform = 'scale(1.1)';
-              showToast(\`Downloading \${fileName}...\`, 'success');
+              showToast(currentLang === 'vi' ? \`Đang tải \${fileName}...\` : \`Downloading \${fileName}...\`, 'success');
               setTimeout(() => {
                 window.open(fileUrl, '_blank');
                 icon.style.transform = '';
@@ -840,7 +877,8 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           const loadMoreBtn = document.getElementById('loadMoreBtn');
           if (loadMoreBtn) {
             loadMoreBtn.addEventListener('click', function() {
-              this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+              this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + 
+                              (currentLang === 'vi' ? 'Đang tải...' : 'Loading...');
               this.style.pointerEvents = 'none';
             });
           }
@@ -921,19 +959,23 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
 export function generateErrorHtml(errorMessage, url) {
   const errorId = `ERR-${Date.now().toString(36).toUpperCase()}`;
   
+  // Detect browser language
+  const browserLanguage = navigator?.language || 'en';
+  const defaultLanguage = browserLanguage.startsWith('vi') ? 'vi' : 'en';
+
   let html = `
     <!DOCTYPE html>
-    <html lang="en">
+    <html lang="${defaultLanguage}">
     <head>
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-      <title>Error | ReVanced Repository</title>
+      <title>${defaultLanguage === 'vi' ? 'Lỗi | Kho ReVanced' : 'Error | ReVanced Repository'}</title>
       
       <!-- Shared CSS -->
       <style>
         :root {
-          --primary: #FF6B6B;
-          --primary-light: #FF8A8A;
+          --primary: #00BCD4;
+          --primary-light: #4DD0E1;
           --error: #CF6679;
           --error-light: #3A1C24;
           --text: #E0E0E0;
@@ -942,8 +984,8 @@ export function generateErrorHtml(errorMessage, url) {
           --surface: #1E1E1E;
           --border: #2C2C2C;
           --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
-          --gradient: linear-gradient(135deg, #FF6B6B 0%, #B71C1C 100%);
-          --gradient-light: linear-gradient(135deg, #FF8A8A 0%, #D32F2F 100%);
+          --gradient: linear-gradient(135deg, #00BCD4 0%, #00838F 100%);
+          --gradient-light: linear-gradient(135deg, #4DD0E1 0%, #00ACC1 100%);
           /* Light mode */
           --bg-light: #F5F5F5;
           --surface-light: #FFFFFF;
@@ -981,7 +1023,7 @@ export function generateErrorHtml(errorMessage, url) {
         }
 
         body.light-mode .error-code {
-          background: #FFE0E0;
+          background: #E0F7FA;
           color: #CF6679;
         }
 
@@ -1052,7 +1094,7 @@ export function generateErrorHtml(errorMessage, url) {
           background: var(--gradient);
           color: var(--text);
           border: none;
-          box-shadow: 0 4px 6px -1px rgba(255, 107, 107, 0.3);
+          box-shadow: 0 4px 6px -1px rgba(0, 188, 212, 0.3);
         }
 
         .btn-primary:hover {
@@ -1104,7 +1146,7 @@ export function generateErrorHtml(errorMessage, url) {
     <body>
       <div class="error-container">
         <div class="error-header">
-          <h1>Error Occurred</h1>
+          <h1>${defaultLanguage === 'vi' ? 'Đã xảy ra lỗi' : 'Error Occurred'}</h1>
         </div>
         
         <div class="error-body">
@@ -1112,22 +1154,22 @@ export function generateErrorHtml(errorMessage, url) {
             <i class="fas fa-exclamation-triangle"></i>
           </div>
         
-          <div class="error-code">Error ID: ${errorId}</div>
+          <div class="error-code">${defaultLanguage === 'vi' ? 'Mã lỗi' : 'Error ID'}: ${errorId}</div>
         
           <p>${errorMessage}</p>
         
           <div class="error-actions">
             <a href="/" class="btn btn-primary">
-              <i class="fas fa-home"></i> Return Home
+              <i class="fas fa-home"></i> ${defaultLanguage === 'vi' ? 'Về trang chủ' : 'Return Home'}
             </a>
             <a href="${url?.pathname || '/'}" class="btn btn-outline">
-              <i class="fas fa-redo"></i> Try Again
+              <i class="fas fa-redo"></i> ${defaultLanguage === 'vi' ? 'Thử lại' : 'Try Again'}
             </a>
           </div>
         </div>
       
         <div class="error-footer">
-          <p>Please contact support if the problem persists</p>
+          <p>${defaultLanguage === 'vi' ? 'Vui lòng liên hệ hỗ trợ nếu lỗi vẫn tiếp diễn' : 'Please contact support if the problem persists'}</p>
         </div>
       </div>
     
