@@ -364,7 +364,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
 }
 
 export function generateErrorHtml(errorMessage) {
-  return `
+  let html = `
     <!DOCTYPE html>
     <html>
     <head>
@@ -422,4 +422,6 @@ export function generateErrorHtml(errorMessage) {
     </body>
     </html>
   `;
-            }
+
+  return html;
+}
