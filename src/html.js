@@ -8,8 +8,12 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
       <title>ReVanced Apps Repository</title>
       <meta name="description" content="Download patched ReVanced apps">
       
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+      <!-- Material Icons & Fonts -->
       <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+      
+      <!-- Favicon SVG (Auto Renew Icon) -->
+      <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2306b6d4'><path d='M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z'/></svg>">
       
       <style>
         :root {
@@ -102,7 +106,6 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           font-size: 0.875rem;
         }
         
-        /* Download Popup */
         .download-popup {
           position: fixed;
           top: 0;
@@ -150,7 +153,6 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           to { opacity: 1; }
         }
         
-        /* Footer */
         .footer {
           text-align: center;
           margin-top: 3rem;
@@ -321,7 +323,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
                     progress = 100;
                     clearInterval(interval);
                     
-                    // Trigger actual download after short delay
+                    // Trigger actual download
                     setTimeout(() => {
                       const a = document.createElement('a');
                       a.href = downloadUrl;
@@ -367,8 +369,13 @@ export function generateErrorHtml(errorMessage) {
     <html>
     <head>
       <title>Error</title>
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+      <!-- Material Icons & Fonts -->
       <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+      
+      <!-- Favicon SVG (Same as main page) -->
+      <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2306b6d4'><path d='M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z'/></svg>">
+      
       <style>
         body {
           font-family: 'Inter', sans-serif;
@@ -415,4 +422,4 @@ export function generateErrorHtml(errorMessage) {
     </body>
     </html>
   `;
-}
+            }
