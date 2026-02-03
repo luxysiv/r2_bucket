@@ -44,16 +44,19 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           padding: 2rem 1rem;
         }
 
+        /* Gmscore Alert Box - Đã được chuyển xuống gần footer */
         .gmscore-alert {
           background-color: var(--warning-bg);
           border: 1px solid var(--warning-border);
           border-radius: 0.5rem;
           padding: 1rem;
+          margin-top: 2rem; /* Tạo khoảng cách với bảng file */
           margin-bottom: 1.5rem;
           display: flex;
           align-items: center;
           gap: 0.75rem;
           color: var(--warning-text);
+          font-size: 0.9rem;
         }
 
         .gmscore-alert a {
@@ -61,6 +64,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           font-weight: 600;
           text-decoration: none;
           border-bottom: 1px solid transparent;
+          transition: border-color 0.2s;
         }
 
         .gmscore-alert a:hover {
@@ -80,7 +84,6 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           border-radius: 0.5rem;
           box-shadow: var(--card-shadow);
           overflow: hidden;
-          margin-bottom: 2rem;
         }
         
         .file-table {
@@ -127,6 +130,19 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           font-size: 0.875rem;
         }
         
+        .footer {
+          text-align: center;
+          padding-top: 1.5rem;
+          border-top: 1px solid var(--border);
+          color: var(--text-light);
+        }
+        
+        .footer a {
+          color: var(--primary);
+          text-decoration: none;
+        }
+        
+        /* Download Popup */
         .download-popup {
           position: fixed;
           top: 0; left: 0; right: 0; bottom: 0;
@@ -136,9 +152,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           align-items: center;
           z-index: 1000;
         }
-        
         .download-popup.active { display: flex; }
-        
         .download-content {
           background-color: white;
           padding: 2rem;
@@ -147,7 +161,6 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           max-width: 400px;
           text-align: center;
         }
-        
         .download-progress {
           margin: 1.5rem 0;
           height: 6px;
@@ -155,35 +168,15 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           border-radius: 3px;
           overflow: hidden;
         }
-        
         .download-progress-bar {
           height: 100%;
           background-color: var(--primary);
           width: 0%;
-          transition: width 0.3s ease;
         }
-        
-        .footer {
-          text-align: center;
-          margin-top: 3rem;
-          padding-top: 1.5rem;
-          border-top: 1px solid var(--border);
-          color: var(--text-light);
-        }
-        
-        .footer a { color: var(--primary); text-decoration: none; }
       </style>
     </head>
     <body>
       <div class="container">
-        <div class="gmscore-alert">
-          <i class="material-icons">info</i>
-          <span>
-            YouTube ReVanced requires <strong>GmsCore</strong> to function. 
-            <a href="https://github.com/revanced/gmscore/releases/latest" target="_blank" rel="noopener">Download ReVanced GmsCore here</a>.
-          </span>
-        </div>
-
         <div class="breadcrumb">
           <a href="/">Home</a>
           ${prefix ? prefix.split('/').filter(Boolean).map((part, i, parts) => {
@@ -218,6 +211,14 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
               }).join('')}
             </tbody>
           </table>
+        </div>
+
+        <div class="gmscore-alert">
+          <i class="material-icons">info</i>
+          <span>
+            YouTube ReVanced requires <strong>GmsCore</strong> to function. 
+            <a href="https://github.com/revanced/gmscore/releases/latest" target="_blank" rel="noopener">Download ReVanced GmsCore here</a>.
+          </span>
         </div>
 
         <footer class="footer">
@@ -268,7 +269,6 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
   return html;
 }
 
-// HÀM NÀY BỊ THIẾU DẪN ĐẾN LỖI BUILD
 export function generateErrorHtml(errorMessage) {
   return `
     <!DOCTYPE html>
