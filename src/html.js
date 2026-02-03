@@ -1,4 +1,29 @@
 export function generateHtml(url, prefix, folders, files, isTruncated, cursor, formatFileSize) {
+  // Logic kiểm tra để hiển thị thông báo phù hợp
+  let alertHtml = '';
+  const currentPath = prefix.toLowerCase();
+  
+  if (currentPath.includes('youtube-music')) {
+    alertHtml = `
+      <div class="gmscore-alert">
+        <i class="material-icons">info</i>
+        <span>
+          YouTube Music ReVanced requires <strong>GmsCore</strong> to activate. 
+          <a href="https://github.com/revanced/gmscore/releases/latest" target="_blank" rel="noopener">Download ReVanced GmsCore here</a>.
+        </span>
+      </div>`;
+  } else if (currentPath.includes('youtube')) {
+    // Luôn ưu tiên youtube-music trước, nếu không phải thì mới check youtube
+    alertHtml = `
+      <div class="gmscore-alert">
+        <i class="material-icons">info</i>
+        <span>
+          YouTube ReVanced requires <strong>GmsCore</strong> to activate. 
+          <a href="https://github.com/revanced/gmscore/releases/latest" target="_blank" rel="noopener">Download ReVanced GmsCore here</a>.
+        </span>
+      </div>`;
+  }
+
   let html = `
     <!DOCTYPE html>
     <html lang="en">
@@ -44,19 +69,24 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           padding: 2rem 1rem;
         }
 
-        /* Gmscore Alert Box - Đã được chuyển xuống gần footer */
         .gmscore-alert {
           background-color: var(--warning-bg);
           border: 1px solid var(--warning-border);
           border-radius: 0.5rem;
           padding: 1rem;
-          margin-top: 2rem; /* Tạo khoảng cách với bảng file */
+          margin-top: 2rem;
           margin-bottom: 1.5rem;
           display: flex;
           align-items: center;
           gap: 0.75rem;
           color: var(--warning-text);
           font-size: 0.9rem;
+          animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(10px); }
+          to { opacity: 1; transform: translateY(0); }
         }
 
         .gmscore-alert a {
@@ -64,7 +94,6 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           font-weight: 600;
           text-decoration: none;
           border-bottom: 1px solid transparent;
-          transition: border-color 0.2s;
         }
 
         .gmscore-alert a:hover {
@@ -125,24 +154,19 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           text-decoration: none;
         }
         
-        .file-size, .file-date {
-          color: var(--text-light);
-          font-size: 0.875rem;
-        }
-        
         .footer {
           text-align: center;
-          padding-top: 1.5rem;
-          border-top: 1px solid var(--border);
+          padding: 2rem 0;
           color: var(--text-light);
+          font-size: 0.875rem;
         }
         
         .footer a {
           color: var(--primary);
           text-decoration: none;
         }
-        
-        /* Download Popup */
+
+        /* Download Popup Styles */
         .download-popup {
           position: fixed;
           top: 0; left: 0; right: 0; bottom: 0;
@@ -172,6 +196,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           height: 100%;
           background-color: var(--primary);
           width: 0%;
+          transition: width 0.2s;
         }
       </style>
     </head>
@@ -213,29 +238,27 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           </table>
         </div>
 
-        <div class="gmscore-alert">
-          <i class="material-icons">info</i>
-          <span>
-            YouTube ReVanced requires <strong>GmsCore</strong> to function. 
-            <a href="https://github.com/revanced/gmscore/releases/latest" target="_blank" rel="noopener">Download ReVanced GmsCore here</a>.
-          </span>
-        </div>
+        ${alertHtml}
 
         <footer class="footer">
-          <p>ReVanced Apps Repository - Maintained by <a href="https://github.com/luxysiv" target="_blank">Manh Duong</a></p>
-          <p style="font-size: 0.75rem;">Powered by Cloudflare Workers • ${new Date().getFullYear()}</p>
+          <div style="margin-bottom: 0.5rem;">ReVanced Apps Repository</div>
+          <div>Maintained with ❤️ by <a href="https://github.com/luxysiv" target="_blank">Manh Duong</a></div>
+          <div style="margin-top: 0.5rem; font-size: 0.75rem; opacity: 0.8;">
+            Powered by Cloudflare Workers • ${new Date().getFullYear()}
+          </div>
         </footer>
 
         <div class="download-popup" id="downloadPopup">
           <div class="download-content">
             <i class="material-icons" style="font-size: 3rem; color: var(--primary);">file_download</i>
-            <h3>Downloading...</h3>
+            <h3 id="dl-title">Preparing Download</h3>
             <div class="download-progress"><div class="download-progress-bar" id="downloadProgressBar"></div></div>
-            <p id="downloadFilename" style="font-weight: 500;"></p>
-            <button id="downloadClose" style="padding: 0.5rem 1rem; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer;">Close</button>
+            <p id="downloadFilename" style="font-weight: 500; font-size: 0.9rem; word-break: break-all;"></p>
+            <button id="downloadClose" style="margin-top: 1rem; padding: 0.5rem 1.5rem; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer;">Close</button>
           </div>
         </div>
       </div>
+
       <script>
         (function() {
           const popup = document.getElementById('downloadPopup');
@@ -248,19 +271,26 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
               e.preventDefault();
               nameEl.textContent = this.getAttribute('data-filename');
               popup.classList.add('active');
+              
               let p = 0;
               const inv = setInterval(() => {
-                p += 10;
-                bar.style.width = p + '%';
+                p += Math.floor(Math.random() * 15) + 5;
                 if (p >= 100) {
+                  p = 100;
                   clearInterval(inv);
                   window.location.href = this.href;
-                  setTimeout(() => { popup.classList.remove('active'); bar.style.width = '0%'; }, 1000);
+                  setTimeout(() => { 
+                    popup.classList.remove('active'); 
+                    bar.style.width = '0%'; 
+                  }, 800);
                 }
-              }, 100);
+                bar.style.width = p + '%';
+              }, 150);
             });
           });
+          
           closeBtn.onclick = () => popup.classList.remove('active');
+          popup.onclick = (e) => { if(e.target === popup) popup.classList.remove('active'); };
         })();
       </script>
     </body>
@@ -275,21 +305,23 @@ export function generateErrorHtml(errorMessage) {
     <html lang="en">
     <head>
       <meta charset="UTF-8">
-      <title>Error</title>
+      <title>Error - ReVanced Repo</title>
       <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
       <style>
-        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f8fafc; margin: 0; }
-        .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; max-width: 400px; }
-        .icon { color: #ef4444; font-size: 48px; }
-        a { color: #06b6d4; text-decoration: none; display: block; margin-top: 1rem; }
+        body { font-family: 'Inter', sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f8fafc; margin: 0; }
+        .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); text-align: center; max-width: 400px; }
+        .icon { color: #ef4444; font-size: 48px; margin-bottom: 1rem; }
+        h2 { margin: 0; color: #083344; }
+        p { color: #64748b; margin: 1rem 0; }
+        a { color: #06b6d4; text-decoration: none; font-weight: 600; }
       </style>
     </head>
     <body>
       <div class="card">
-        <i class="material-icons icon">error</i>
-        <h2>Error Occurred</h2>
+        <i class="material-icons icon">error_outline</i>
+        <h2>Something went wrong</h2>
         <p>${errorMessage}</p>
-        <a href="/">Back to Home</a>
+        <a href="/">Return to Home</a>
       </div>
     </body>
     </html>
