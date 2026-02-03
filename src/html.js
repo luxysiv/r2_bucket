@@ -8,11 +8,9 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
       <title>ReVanced Apps Repository</title>
       <meta name="description" content="Download patched ReVanced apps">
       
-      <!-- Material Icons & Fonts -->
       <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
       <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
       
-      <!-- Favicon SVG (Auto Renew Icon) -->
       <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2306b6d4'><path d='M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z'/></svg>">
       
       <style>
@@ -26,6 +24,9 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           --border: #e2e8f0;
           --hover-bg: #f8fafc;
           --card-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+          --warning-bg: #fff7ed;
+          --warning-border: #fdba74;
+          --warning-text: #9a3412;
         }
         
         body {
@@ -41,6 +42,31 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           max-width: 800px;
           margin: 0 auto;
           padding: 2rem 1rem;
+        }
+
+        /* Gmscore Alert Box */
+        .gmscore-alert {
+          background-color: var(--warning-bg);
+          border: 1px solid var(--warning-border);
+          border-radius: 0.5rem;
+          padding: 1rem;
+          margin-bottom: 1.5rem;
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          color: var(--warning-text);
+        }
+
+        .gmscore-alert a {
+          color: var(--primary-dark);
+          font-weight: 600;
+          text-decoration: none;
+          border-bottom: 1px solid transparent;
+          transition: border-color 0.2s;
+        }
+
+        .gmscore-alert a:hover {
+          border-color: var(--primary-dark);
         }
         
         .breadcrumb {
@@ -179,6 +205,14 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
     </head>
     <body>
       <div class="container">
+        <div class="gmscore-alert">
+          <i class="material-icons">info</i>
+          <span>
+            YouTube ReVanced requires <strong>GmsCore</strong> to function. 
+            <a href="https://github.com/revanced/gmscore/releases/latest" target="_blank">Download ReVanced GmsCore here</a>.
+          </span>
+        </div>
+
         <div class="breadcrumb">
           <a href="/">Home</a>
           ${prefix ? prefix.split('/').filter(Boolean).map((part, i, parts) => {
@@ -252,7 +286,6 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           </table>
         </div>
 
-        <!-- Download Popup -->
         <div class="download-popup" id="downloadPopup">
           <div class="download-content">
             <i class="material-icons" style="font-size: 3rem; color: var(--primary);">file_download</i>
@@ -278,7 +311,6 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           </div>
         </div>
 
-        <!-- Footer -->
         <footer class="footer">
           <p>ReVanced Apps Repository - Pre-patched Android applications</p>
           <p>Maintained with ❤️ by <a href="https://github.com/luxysiv" target="_blank">Manh Duong</a></p>
@@ -355,69 +387,6 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
             });
           })();
         </script>
-      </div>
-    </body>
-    </html>
-  `;
-
-  return html;
-}
-
-export function generateErrorHtml(errorMessage) {
-  let html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>Error</title>
-      <!-- Material Icons & Fonts -->
-      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-      
-      <!-- Favicon SVG (Same as main page) -->
-      <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%2306b6d4'><path d='M12 6v3l4-4-4-4v3c-4.42 0-8 3.58-8 8 0 1.57.46 3.03 1.24 4.26L6.7 14.8c-.45-.83-.7-1.79-.7-2.8 0-3.31 2.69-6 6-6zm6.76 1.74L17.3 9.2c.44.84.7 1.79.7 2.8 0 3.31-2.69 6-6 6v-3l-4 4 4 4v-3c4.42 0 8-3.58 8-8 0-1.57-.46-3.03-1.24-4.26z'/></svg>">
-      
-      <style>
-        body {
-          font-family: 'Inter', sans-serif;
-          background-color: #f8fafc;
-          color: #083344;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          height: 100vh;
-          margin: 0;
-          padding: 1rem;
-        }
-        .error-container {
-          text-align: center;
-          max-width: 600px;
-          background: white;
-          padding: 2rem;
-          border-radius: 0.5rem;
-          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        }
-        h1 {
-          color: #06b6d4;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 0.5rem;
-        }
-        a {
-          color: #06b6d4;
-          text-decoration: none;
-          display: inline-flex;
-          align-items: center;
-          gap: 0.25rem;
-          margin-top: 1rem;
-        }
-      </style>
-    </head>
-    <body>
-      <div class="error-container">
-        <h1><i class="material-icons">error</i> An Error Occurred</h1>
-        <p>${errorMessage}</p>
-        <a href="/"><i class="material-icons">home</i>Return to home page</a>
       </div>
     </body>
     </html>
