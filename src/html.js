@@ -44,7 +44,6 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           padding: 2rem 1rem;
         }
 
-        /* Gmscore Alert Box */
         .gmscore-alert {
           background-color: var(--warning-bg);
           border: 1px solid var(--warning-border);
@@ -62,7 +61,6 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           font-weight: 600;
           text-decoration: none;
           border-bottom: 1px solid transparent;
-          transition: border-color 0.2s;
         }
 
         .gmscore-alert a:hover {
@@ -75,7 +73,6 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           margin-bottom: 1.5rem;
           font-size: 0.875rem;
           color: var(--text-light);
-          padding: 0.5rem 0;
         }
         
         .file-explorer {
@@ -98,7 +95,6 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           text-align: left;
           padding: 1rem;
           font-size: 0.75rem;
-          letter-spacing: 0.05em;
         }
         
         .file-table td {
@@ -118,13 +114,12 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
         .file-link {
           color: var(--text);
           text-decoration: none;
-          cursor: pointer;
         }
         
         .folder-link {
           color: var(--primary);
-          text-decoration: none;
           font-weight: 500;
+          text-decoration: none;
         }
         
         .file-size, .file-date {
@@ -134,10 +129,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
         
         .download-popup {
           position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
+          top: 0; left: 0; right: 0; bottom: 0;
           background-color: rgba(0, 0, 0, 0.5);
           display: none;
           justify-content: center;
@@ -145,10 +137,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           z-index: 1000;
         }
         
-        .download-popup.active {
-          display: flex;
-          animation: fadeIn 0.3s ease;
-        }
+        .download-popup.active { display: flex; }
         
         .download-content {
           background-color: white;
@@ -174,11 +163,6 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           transition: width 0.3s ease;
         }
         
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        
         .footer {
           text-align: center;
           margin-top: 3rem;
@@ -187,20 +171,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           color: var(--text-light);
         }
         
-        .footer a {
-          color: var(--primary);
-          text-decoration: none;
-        }
-        
-        .footer a:hover {
-          text-decoration: underline;
-        }
-        
-        .github-link {
-          display: inline-flex;
-          align-items: center;
-          margin-top: 0.5rem;
-        }
+        .footer a { color: var(--primary); text-decoration: none; }
       </style>
     </head>
     <body>
@@ -209,7 +180,7 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           <i class="material-icons">info</i>
           <span>
             YouTube ReVanced requires <strong>GmsCore</strong> to function. 
-            <a href="https://github.com/revanced/gmscore/releases/latest" target="_blank">Download ReVanced GmsCore here</a>.
+            <a href="https://github.com/revanced/gmscore/releases/latest" target="_blank" rel="noopener">Download ReVanced GmsCore here</a>.
           </span>
         </div>
 
@@ -217,180 +188,110 @@ export function generateHtml(url, prefix, folders, files, isTruncated, cursor, f
           <a href="/">Home</a>
           ${prefix ? prefix.split('/').filter(Boolean).map((part, i, parts) => {
             const path = parts.slice(0, i + 1).join('/') + '/';
-            return `
-              <span class="breadcrumb-separator">/</span>
-              <a href="?prefix=${encodeURIComponent(path)}">${part}</a>
-            `;
+            return `<span style="margin: 0 0.5rem">/</span><a href="?prefix=${encodeURIComponent(path)}">${part}</a>`;
           }).join('') : ''}
         </div>
         
         <div class="file-explorer">
           <table class="file-table">
             <thead>
-              <tr>
-                <th>Name</th>
-                <th>Size</th>
-                <th>Last Modified</th>
-              </tr>
+              <tr><th>Name</th><th>Size</th><th>Last Modified</th></tr>
             </thead>
             <tbody>
-              ${folders.length === 0 && files.length === 0 ? `
-                <tr>
-                  <td colspan="3" style="text-align: center; padding: 3rem; color: var(--text-light);">
-                    <i class="material-icons" style="font-size: 3rem; color: var(--border);">folder_open</i>
-                    <p>This folder is empty</p>
-                  </td>
-                </tr>
-              ` : ''}
+              ${folders.length === 0 && files.length === 0 ? `<tr><td colspan="3" style="text-align: center; padding: 3rem; color: var(--text-light);">Folder is empty</td></tr>` : ''}
               ${folders.map(folder => {
                 const folderName = folder.replace(prefix, '').replace(/\/$/, '');
                 return `
                   <tr>
-                    <td>
-                      <div style="display: flex; align-items: center;">
-                        <i class="material-icons file-icon">folder</i>
-                        <a href="?prefix=${encodeURIComponent(folder)}" class="folder-link">${folderName}</a>
-                      </div>
-                    </td>
-                    <td class="file-size">-</td>
-                    <td class="file-date">-</td>
-                  </tr>
-                `;
+                    <td><div style="display: flex; align-items: center;"><i class="material-icons file-icon">folder</i><a href="?prefix=${encodeURIComponent(folder)}" class="folder-link">${folderName}</a></div></td>
+                    <td class="file-size">-</td><td class="file-date">-</td>
+                  </tr>`;
               }).join('')}
               ${files.map(file => {
                 const fileName = file.key.replace(prefix, '');
                 return `
                   <tr>
-                    <td>
-                      <div style="display: flex; align-items: center;">
-                        <i class="material-icons file-icon">android</i>
-                        <a href="?download=${encodeURIComponent(file.key)}" 
-                           class="file-link" 
-                           download 
-                           data-filename="${fileName}" 
-                           data-filesize="${formatFileSize(file.size)}">
-                          ${fileName}
-                        </a>
-                      </div>
-                    </td>
+                    <td><div style="display: flex; align-items: center;"><i class="material-icons file-icon">android</i><a href="?download=${encodeURIComponent(file.key)}" class="file-link" download data-filename="${fileName}" data-filesize="${formatFileSize(file.size)}">${fileName}</a></div></td>
                     <td class="file-size">${formatFileSize(file.size)}</td>
-                    <td class="file-date">${new Date(file.uploaded).toLocaleDateString('en-US', {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric'
-                    })}</td>
-                  </tr>
-                `;
+                    <td class="file-date">${new Date(file.uploaded).toLocaleDateString()}</td>
+                  </tr>`;
               }).join('')}
             </tbody>
           </table>
         </div>
 
+        <footer class="footer">
+          <p>ReVanced Apps Repository - Maintained by <a href="https://github.com/luxysiv" target="_blank">Manh Duong</a></p>
+          <p style="font-size: 0.75rem;">Powered by Cloudflare Workers • ${new Date().getFullYear()}</p>
+        </footer>
+
         <div class="download-popup" id="downloadPopup">
           <div class="download-content">
             <i class="material-icons" style="font-size: 3rem; color: var(--primary);">file_download</i>
-            <h3>Downloading File</h3>
-            <div class="download-progress">
-              <div class="download-progress-bar" id="downloadProgressBar"></div>
-            </div>
-            <div style="margin: 1rem 0;">
-              <p id="downloadFilename" style="margin: 0.5rem 0; font-weight: 500;"></p>
-              <p id="downloadFilesize" style="margin: 0.5rem 0; color: var(--text-light);"></p>
-            </div>
-            <button id="downloadClose" style="
-              padding: 0.5rem 1.5rem;
-              background-color: var(--primary);
-              color: white;
-              border: none;
-              border-radius: 0.375rem;
-              cursor: pointer;
-              transition: background-color 0.2s;
-            ">
-              Close
-            </button>
+            <h3>Downloading...</h3>
+            <div class="download-progress"><div class="download-progress-bar" id="downloadProgressBar"></div></div>
+            <p id="downloadFilename" style="font-weight: 500;"></p>
+            <button id="downloadClose" style="padding: 0.5rem 1rem; background: var(--primary); color: white; border: none; border-radius: 4px; cursor: pointer;">Close</button>
           </div>
         </div>
-
-        <footer class="footer">
-          <p>ReVanced Apps Repository - Pre-patched Android applications</p>
-          <p>Maintained with ❤️ by <a href="https://github.com/luxysiv" target="_blank">Manh Duong</a></p>
-          <a href="https://github.com/luxysiv/revanced-nonroot" class="github-link" target="_blank">
-            <i class="material-icons" style="margin-right: 0.25rem;">code</i>
-            View on GitHub
-          </a>
-          <p style="margin-top: 1rem; font-size: 0.75rem;">
-            Powered by Cloudflare Workers • ${new Date().getFullYear()}
-          </p>
-        </footer>
-
-        <script>
-          (function() {
-            // DOM elements
-            const downloadPopup = document.getElementById('downloadPopup');
-            const progressBar = document.getElementById('downloadProgressBar');
-            const filenameEl = document.getElementById('downloadFilename');
-            const filesizeEl = document.getElementById('downloadFilesize');
-            const closeBtn = document.getElementById('downloadClose');
-            
-            // Handle file downloads
-            document.querySelectorAll('.file-link[download]').forEach(link => {
-              link.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                // Get file info
-                const filename = this.getAttribute('data-filename');
-                const filesize = this.getAttribute('data-filesize');
-                const downloadUrl = this.href;
-                
-                // Show popup
-                filenameEl.textContent = filename;
-                filesizeEl.textContent = filesize;
-                downloadPopup.classList.add('active');
-                
-                // Simulate download progress
-                let progress = 0;
-                const interval = setInterval(() => {
-                  progress += Math.random() * 15;
-                  if (progress >= 100) {
-                    progress = 100;
-                    clearInterval(interval);
-                    
-                    // Trigger actual download
-                    setTimeout(() => {
-                      const a = document.createElement('a');
-                      a.href = downloadUrl;
-                      a.download = filename;
-                      document.body.appendChild(a);
-                      a.click();
-                      document.body.removeChild(a);
-                      
-                      // Close popup after download
-                      setTimeout(() => {
-                        downloadPopup.classList.remove('active');
-                        progressBar.style.width = '0%';
-                      }, 500);
-                    }, 300);
-                  }
-                  progressBar.style.width = progress + '%';
-                }, 150);
-                
-                // Close button handler
-                const closeHandler = () => {
-                  clearInterval(interval);
-                  downloadPopup.classList.remove('active');
-                  progressBar.style.width = '0%';
-                };
-                
-                closeBtn.onclick = closeHandler;
-                downloadPopup.onclick = (e) => e.target === downloadPopup && closeHandler();
-              });
+      </div>
+      <script>
+        (function() {
+          const popup = document.getElementById('downloadPopup');
+          const bar = document.getElementById('downloadProgressBar');
+          const nameEl = document.getElementById('downloadFilename');
+          const closeBtn = document.getElementById('downloadClose');
+          
+          document.querySelectorAll('.file-link[download]').forEach(link => {
+            link.addEventListener('click', function(e) {
+              e.preventDefault();
+              nameEl.textContent = this.getAttribute('data-filename');
+              popup.classList.add('active');
+              let p = 0;
+              const inv = setInterval(() => {
+                p += 10;
+                bar.style.width = p + '%';
+                if (p >= 100) {
+                  clearInterval(inv);
+                  window.location.href = this.href;
+                  setTimeout(() => { popup.classList.remove('active'); bar.style.width = '0%'; }, 1000);
+                }
+              }, 100);
             });
-          })();
-        </script>
+          });
+          closeBtn.onclick = () => popup.classList.remove('active');
+        })();
+      </script>
+    </body>
+    </html>
+  `;
+  return html;
+}
+
+// HÀM NÀY BỊ THIẾU DẪN ĐẾN LỖI BUILD
+export function generateErrorHtml(errorMessage) {
+  return `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <title>Error</title>
+      <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+      <style>
+        body { font-family: sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background: #f8fafc; margin: 0; }
+        .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); text-align: center; max-width: 400px; }
+        .icon { color: #ef4444; font-size: 48px; }
+        a { color: #06b6d4; text-decoration: none; display: block; margin-top: 1rem; }
+      </style>
+    </head>
+    <body>
+      <div class="card">
+        <i class="material-icons icon">error</i>
+        <h2>Error Occurred</h2>
+        <p>${errorMessage}</p>
+        <a href="/">Back to Home</a>
       </div>
     </body>
     </html>
   `;
-
-  return html;
 }
